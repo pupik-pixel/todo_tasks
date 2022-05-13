@@ -1,7 +1,7 @@
 <?php
     class DatabaseData 
     {
-        public static function isAuthenticationSuccessful() 
+        public static function isAuthenticationStatus()
         {
             $oConnection = new mysqli('localhost', 'root', '', 'todo_list_task');
             $oQueryWithLogin = $oConnection->query('select session_id from users where session_id = \'' . $_COOKIE['session'] . '\'');
@@ -20,9 +20,11 @@
             $oQueryWithLogin = $oConnection->query(
                 'select caption, priority.value as priority, 
                 expiration_date, 
-                users.name, 
-                users.surname, 
-                users.patronymic_name,
+                concat(users.surname, 
+                    \' \',
+                users.name,
+                    \' \',
+                users.patronymic_name) as name,
                 status.value as status
                 from tasks
                 join status on tasks.status = status.id
