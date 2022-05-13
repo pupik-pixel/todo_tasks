@@ -1,10 +1,12 @@
 function fillTableWithTasks(data) {
+    $(".table > tbody").remove(); 
     let table = document.querySelector('.table');
+    let tbody = table.createTBody();
     data.tasksData.forEach(element => {
         let taskDate = Date.parse(element.expiration_date);
         let nowDate = new Date();
         let dateDiff = nowDate - taskDate;
-        let newRow = table.insertRow(); 
+        let newRow = tbody.insertRow(); 
         if (dateDiff > 0 && (element.status == 'к выполнению' || element.status == 'выполняется')) {
             newRow.classList.add("table-danger");
         }
@@ -20,7 +22,6 @@ function fillTableWithTasks(data) {
             newCell.appendChild(newText); 
         });
     });
-
 }
 
 $.ajax({
