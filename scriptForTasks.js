@@ -29,7 +29,12 @@ $.ajax({
     url: 'tasksAction.php',
     success: function (response) {
         let jsonData = JSON.parse(response);
-        fillTableWithTasks(jsonData);
-        console.log(jsonData);
+        if (jsonData.isAuthentication) {
+            fillTableWithTasks(jsonData);
+            console.log(jsonData);
+        }
+        else {
+            window.location.replace('auth.php');
+        }
     }
 });
