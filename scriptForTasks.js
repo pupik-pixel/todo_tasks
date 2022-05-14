@@ -33,25 +33,15 @@ function fillTableWithTasks(data) {
 
 let dateCheckbox = document.querySelector('.date-check-input-js');
 let dateSelector = document.querySelector('.date-select-js');
+dateSelector.onchange = function() {
+    ajaxQuery({
+        'filterData': dateSelector.value
+    });
+}
 dateCheckbox.onchange = function() {
     if (dateCheckbox.checked) {
-        $.ajax({
-            datatype: "json",
-            type: "POST",
-            url: 'tasksAction.php',
-            data: {
-                'filterData': dateSelector.value
-            },
-            success: function (response) {
-                let jsonData = JSON.parse(response);
-                if (jsonData.isAuthentication) {
-                    fillTableWithTasks(jsonData);
-                    console.log(jsonData);
-                }
-                else {
-                    window.location.replace('auth.php');
-                }
-            }
+        ajaxQuery({
+            'filterData': dateSelector.value
         });
         dateSelector.removeAttribute("disabled");
     }
@@ -60,18 +50,22 @@ dateCheckbox.onchange = function() {
     }
 }
 
-$.ajax({
-    datatype: "json",
-    type: "POST",
-    url: 'tasksAction.php',
-    success: function (response) {
-        let jsonData = JSON.parse(response);
-        if (jsonData.isAuthentication) {
-            fillTableWithTasks(jsonData);
-            console.log(jsonData);
+function ajaxQuery(dataForQuery = null) {
+    $.ajax({
+        type: "POST",
+        url: 'tasksAction.php',
+        data: dataForQuery,
+        success: function (response) {
+            let jsonData = JSON.parse(response);
+            if (jsonData.isAuthentication) {
+                fillTableWithTasks(jsonData);
+                console.log(jsonData);
+            }
+            else {
+                window.location.replace('auth.php');
+            }
         }
-        else {
-            window.location.replace('auth.php');
-        }
-    }
-});
+    });
+}
+
+ajaxQuery();
