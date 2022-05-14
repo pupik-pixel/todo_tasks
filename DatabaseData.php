@@ -136,7 +136,7 @@
                 'priority = \''.$_POST['priority'].'\','.
                 'status = \''.$_POST['status'].'\','.
                 'responsible = \''.$_POST['responsible'].'\''.
-                'where tasks.id = '.$_POST['ID'];
+                'where tasks.id = '.$_POST['id'];
             $oConnection->query($sQuery);
         }
     }

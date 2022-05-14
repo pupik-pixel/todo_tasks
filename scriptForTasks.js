@@ -43,20 +43,15 @@ let statusModalSelector = document.querySelector('.status-select-modal-js');
 function onClickRowHandler(event) {
     let taskData = jsonData.tasksData;
     let taskIndex = event.currentTarget.rowIndex - 1;
-    let modalInput = document.querySelector('input[name=\'ID\']');
-    modalInput.value = taskData[taskIndex].id;
-    modalInput = document.querySelector('input[name=\'caption\']');
-    modalInput.value = taskData[taskIndex].caption;
-    modalInput = document.querySelector('input[name=\'description\']');
-    modalInput.value = taskData[taskIndex].description;
-    modalInput = document.querySelector('input[name=\'date_of_creation\']');
-    modalInput.value = taskData[taskIndex].date_of_creation;
-    modalInput = document.querySelector('input[name=\'expiration_date\']');
-    modalInput.value = taskData[taskIndex].expiration_date;
-    modalInput = document.querySelector('input[name=\'update_date\']');
-    modalInput.value = taskData[taskIndex].update_date;
-    modalInput = document.querySelector('input[name=\'cName\']');
-    modalInput.value = taskData[taskIndex].cName;
+    let elementArray = ['id', 'caption', 'description', 'date_of_creation', 'expiration_date', 'update_date', 'cName'];
+    for (var key of elementArray) {
+        let modalInput = document.querySelector('input[name=\''+ key + '\']');
+        if (key == 'id' || key == 'date_of_creation' || key == 'update_date' || key == 'cName') {
+            modalInput.classList.toggle('form-control');
+            modalInput.classList.toggle('input-group-text');
+        }
+        modalInput.value = taskData[taskIndex][key];
+    }
 
     let priorityData = jsonData.priority;
     $('.priority-select-modal-js').empty();
@@ -177,9 +172,9 @@ function ajaxQuery(dataForQuery = {}) {
     });
 }
 
-let modalSubmitButton = document.querySelector('.update-btn-primary');
+let modalSubmitButton = document.querySelector('.save-btn-primary');
 modalSubmitButton.onclick = function() {
-    let dataFromForm = $('.update-modal-body').serialize() + '&update=true';
+    let dataFromForm = $('.modal-body').serialize() + '&update=true';
     ajaxQuery(dataFromForm);
 }
 
