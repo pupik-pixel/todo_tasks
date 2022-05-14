@@ -43,9 +43,11 @@
             $aResult = [];
             $oConnection = new mysqli('localhost', 'root', '', 'todo_list_task');
             $oQueryWithLogin = $oConnection->query(
-                'select users.name, 
-                users.surname, 
-                users.patronymic_name
+                'select concat(users.surname, 
+                    \' \',
+                users.name,
+                    \' \',
+                users.patronymic_name) as name
                 from tasks
                 join users on tasks.responsible = users.id
                 where tasks.responsible is not null 

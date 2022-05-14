@@ -22,6 +22,42 @@ function fillTableWithTasks(data) {
             newCell.appendChild(newText); 
         });
     });
+    data.responsibles.forEach(element => {
+        let responsibleSelect = document.querySelector('.responsible-select-js');
+        let newOption = document.createElement("option");
+        newOption.value = element.name;
+        newOption.text = element.name;
+        responsibleSelect.add(newOption, null);
+    });
+}
+
+let dateCheckbox = document.querySelector('.date-check-input-js');
+let dateSelector = document.querySelector('.date-select-js');
+dateCheckbox.onchange = function() {
+    if (dateCheckbox.checked) {
+        $.ajax({
+            datatype: "json",
+            type: "POST",
+            url: 'tasksAction.php',
+            data: {
+                'filterData': dateSelector.value
+            },
+            success: function (response) {
+                let jsonData = JSON.parse(response);
+                if (jsonData.isAuthentication) {
+                    fillTableWithTasks(jsonData);
+                    console.log(jsonData);
+                }
+                else {
+                    window.location.replace('auth.php');
+                }
+            }
+        });
+        dateSelector.removeAttribute("disabled");
+    }
+    else {
+        dateSelector.setAttribute("disabled", "disabled");
+    }
 }
 
 $.ajax({
