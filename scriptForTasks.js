@@ -22,22 +22,17 @@ function fillTableWithTasks(data) {
             newCell.appendChild(newText); 
         });
     });
+    $('.responsible-select-js').empty();
     data.responsibles.forEach(element => {
-        let responsibleSelect = document.querySelector('.responsible-select-js');
         let newOption = document.createElement("option");
-        newOption.value = element.name;
+        newOption.value = element.id;
         newOption.text = element.name;
-        responsibleSelect.add(newOption, null);
+        responsibleSelector.add(newOption, null);
     });
 }
 
 let dateCheckbox = document.querySelector('.date-check-input-js');
 let dateSelector = document.querySelector('.date-select-js');
-dateSelector.onchange = function() {
-    ajaxQuery({
-        'filterData': dateSelector.value
-    });
-}
 dateCheckbox.onchange = function() {
     if (dateCheckbox.checked) {
         ajaxQuery({
@@ -48,6 +43,30 @@ dateCheckbox.onchange = function() {
     else {
         dateSelector.setAttribute("disabled", "disabled");
     }
+}
+dateSelector.onchange = function() {
+    ajaxQuery({
+        'filterData': dateSelector.value
+    });
+}
+
+let responsibleCheckbox = document.querySelector('.responsible-check-input-js');
+let responsibleSelector = document.querySelector('.responsible-select-js');
+responsibleCheckbox.onchange = function() {
+    if (responsibleCheckbox.checked) {
+        ajaxQuery({
+            'filterResponsible': responsibleSelector.value
+        });
+        responsibleSelector.removeAttribute("disabled");
+    }
+    else {
+        responsibleSelector.setAttribute("disabled", "disabled");
+    }
+}
+responsibleSelector.onchange = function() {
+    ajaxQuery({
+        'filterResponsible': responsibleSelector.value
+    });
 }
 
 function ajaxQuery(dataForQuery = null) {

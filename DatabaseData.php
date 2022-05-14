@@ -56,8 +56,8 @@
         {
             $aResult = [];
             $oConnection = new mysqli('localhost', 'root', '', 'todo_list_task');
-            $oQueryWithLogin = $oConnection->query(
-                'select concat(users.surname, 
+            $sQuery = 'select users.id,
+                concat(users.surname, 
                     \' \',
                 users.name,
                     \' \',
@@ -65,8 +65,12 @@
                 from tasks
                 join users on tasks.responsible = users.id
                 where tasks.responsible is not null 
-                group by tasks.responsible'
-            );
+                ';
+            if (!empty($_POST['filterResponsible'])) {
+                $sQuery = $sQuery.'and users.id='.$_POST['filterResponsible'];
+            }
+            $sQuery = $sQuery.' group by tasks.responsible';
+            $oQueryWithLogin = $oConnection->query($sQuery);
             while ($aResultRow = $oQueryWithLogin->fetch_assoc())
             {
                 $aResult[] = $aResultRow;
