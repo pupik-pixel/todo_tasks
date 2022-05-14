@@ -53,10 +53,10 @@
           <h5 class="modal-title" id="exampleModalLabel">Редактирование</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <form class="modal-body">
-            <div class="input-group mb-3">
+        <form class="modal-body update-modal-body">
+            <div class="input-group mb-3" disabled>
                 <span class="input-group-text" id="inputGroup-sizing-default">№:</span>
-                <input name="ID" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+                <input name="ID" type="text" class="input-group-text" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
             </div>
             <div class="input-group mb-3">
                 <span class="input-group-text" id="inputGroup-sizing-default">Заголовок:</span>
@@ -68,7 +68,7 @@
             </div>
             <div class="input-group mb-3">
                 <span class="input-group-text" id="inputGroup-sizing-default">Дата создания:</span>
-                <input name="date_of_creation" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+                <input name="date_of_creation" type="text" class="input-group-text" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
             </div>
             <div class="input-group mb-3">
                 <span class="input-group-text" id="inputGroup-sizing-default">Дата окончания:</span>
@@ -76,26 +76,31 @@
             </div>
             <div class="input-group mb-3">
                 <span class="input-group-text" id="inputGroup-sizing-default">Дата обновления:</span>
-                <input name="update_date" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+                <input name="update_date" type="text" class="input-group-text" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
             </div>
             <div class="input-group mb-3">
                 <span class="input-group-text" id="inputGroup-sizing-default">Приоритет:</span>
-                <input name="priority" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+                <select name = "priority" class="form-select priority-select-modal-js">
+                </select>
             </div>
             <div class="input-group mb-3">
                 <span class="input-group-text" id="inputGroup-sizing-default">Статус:</span>
-                <input name="status" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+                <select name = 'status' class="form-select status-select-modal-js">
+                </select>
             </div>
             <div class="input-group mb-3">
                 <span class="input-group-text" id="inputGroup-sizing-default">Создатель задачи:</span>
-                <input name="cName" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+                <input name="cName" type="text" class="input-group-text" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
             </div>
-            <select class="form-select responsible-select-modal-js">
-            </select>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-default">Ответственный:</span>
+                <select name="responsible" class="form-select responsible-select-modal-js">
+                </select>
+            </div>
         </form>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-          <button type="button" class="btn btn-primary">Сохранить</button>
+          <button type="submit" class="btn btn-primary update-btn-primary" data-bs-dismiss="modal">Сохранить</button>
         </div>
       </div>
     </div>

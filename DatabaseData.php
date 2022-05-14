@@ -31,6 +31,8 @@
                 creator,
                 responsible,
                 tasks.id,
+                tasks.priority as priorityId,
+                tasks.status as statusId,
                 concat(c.surname, 
                     \' \',
                 c.name,
@@ -94,5 +96,47 @@
                 $aResult[] = $aResultRow;
             }
             return $aResult;
+        }
+
+        public static function getAllPriority()
+        {
+            $aResult = [];
+            $oConnection = new mysqli('localhost', 'root', '', 'todo_list_task');
+            $sQuery = 'select * from priority';
+            $oQueryWithLogin = $oConnection->query($sQuery);
+            while ($aResultRow = $oQueryWithLogin->fetch_assoc())
+            {
+                $aResult[] = $aResultRow;
+            }
+            return $aResult;
+        }
+
+        public static function getAllStatus()
+        {
+            $aResult = [];
+            $oConnection = new mysqli('localhost', 'root', '', 'todo_list_task');
+            $sQuery = 'select * from status';
+            $oQueryWithLogin = $oConnection->query($sQuery);
+            while ($aResultRow = $oQueryWithLogin->fetch_assoc())
+            {
+                $aResult[] = $aResultRow;
+            }
+            return $aResult;
+        }
+
+        public static function updateDataForTask()
+        {
+            $oConnection = new mysqli('localhost', 'root', '', 'todo_list_task');
+            $oCurrentDate = new DateTime(date('Y-m-d', time()));
+            $sCurrentDate = $oCurrentDate->format('Y-m-d');
+            $sQuery = 'update tasks set caption =\''.$_POST['caption'].'\','.
+                'description = \''.$_POST['description'].'\','.
+                'expiration_date = \''.$_POST['expiration_date'].'\','.
+                'update_date = \''.$sCurrentDate.'\','.
+                'priority = \''.$_POST['priority'].'\','.
+                'status = \''.$_POST['status'].'\','.
+                'responsible = \''.$_POST['responsible'].'\''.
+                'where tasks.id = '.$_POST['ID'];
+            $oConnection->query($sQuery);
         }
     }

@@ -38,36 +38,69 @@ function fillTableWithTasks(data) {
 
 let modalBody = document.querySelector('.modal-body');
 let responsibleModalSelector = document.querySelector('.responsible-select-modal-js');
+let priorityModalSelector = document.querySelector('.priority-select-modal-js');
+let statusModalSelector = document.querySelector('.status-select-modal-js');
 function onClickRowHandler(event) {
     let taskData = jsonData.tasksData;
     let taskIndex = event.currentTarget.rowIndex - 1;
-    let idInput = document.querySelector('input[name=\'ID\']');
-    idInput.value = taskData[taskIndex].id;
-    idInput = document.querySelector('input[name=\'caption\']');
-    idInput.value = taskData[taskIndex].caption;
-    idInput = document.querySelector('input[name=\'description\']');
-    idInput.value = taskData[taskIndex].description;
-    idInput = document.querySelector('input[name=\'date_of_creation\']');
-    idInput.value = taskData[taskIndex].date_of_creation;
-    idInput = document.querySelector('input[name=\'expiration_date\']');
-    idInput.value = taskData[taskIndex].expiration_date;
-    idInput = document.querySelector('input[name=\'update_date\']');
-    idInput.value = taskData[taskIndex].update_date;
-    idInput = document.querySelector('input[name=\'priority\']');
-    idInput.value = taskData[taskIndex].priority;
-    idInput = document.querySelector('input[name=\'status\']');
-    idInput.value = taskData[taskIndex].status;
-    idInput = document.querySelector('input[name=\'cName\']');
-    idInput.value = taskData[taskIndex].cName;
+    let modalInput = document.querySelector('input[name=\'ID\']');
+    modalInput.value = taskData[taskIndex].id;
+    modalInput = document.querySelector('input[name=\'caption\']');
+    modalInput.value = taskData[taskIndex].caption;
+    modalInput = document.querySelector('input[name=\'description\']');
+    modalInput.value = taskData[taskIndex].description;
+    modalInput = document.querySelector('input[name=\'date_of_creation\']');
+    modalInput.value = taskData[taskIndex].date_of_creation;
+    modalInput = document.querySelector('input[name=\'expiration_date\']');
+    modalInput.value = taskData[taskIndex].expiration_date;
+    modalInput = document.querySelector('input[name=\'update_date\']');
+    modalInput.value = taskData[taskIndex].update_date;
+    modalInput = document.querySelector('input[name=\'cName\']');
+    modalInput.value = taskData[taskIndex].cName;
+
+    let priorityData = jsonData.priority;
+    $('.priority-select-modal-js').empty();
+    newOption = document.createElement("option");
+    newOption.value = taskData[taskIndex].priorityId;
+    newOption.text = taskData[taskIndex].priority;
+    newOption.setAttribute('selected', 'selected');
+    priorityModalSelector.add(newOption, null);
+    let priorityId = taskData[taskIndex].priorityId;
+    for (var key in priorityData) {
+        if (priorityData[key].id == priorityId) {
+            continue;
+        }
+        newOption = document.createElement("option");
+        newOption.value = priorityData[key].id;
+        newOption.text = priorityData[key].value;
+        priorityModalSelector.add(newOption, null);
+    }
+
+    let statusData = jsonData.status;
+    $('.status-select-modal-js').empty();
+    newOption = document.createElement("option");
+    newOption.value = taskData[taskIndex].statusId;
+    newOption.text = taskData[taskIndex].status;
+    newOption.setAttribute('selected', 'selected');
+    statusModalSelector.add(newOption, null);
+    let statusId = taskData[taskIndex].statusId;
+    for (var key in statusData) {
+        if (statusData[key].id == priorityId) {
+            continue;
+        }
+        newOption = document.createElement("option");
+        newOption.value = statusData[key].id;
+        newOption.text = statusData[key].value;
+        statusModalSelector.add(newOption, null);
+    }
 
     let responsiblesData = jsonData.responsibles;
     $('.responsible-select-modal-js').empty();
-    let newOption = document.createElement("option");
+    newOption = document.createElement("option");
     newOption.value = taskData[taskIndex].responsible;
     newOption.text = taskData[taskIndex].rName;
-    responsibleModalSelector.setAttribute('selected', 'selected');
+    newOption.setAttribute('selected', 'selected');
     responsibleModalSelector.add(newOption, null);
-
     let responsibleId = taskData[taskIndex].responsible;
     for (var key in responsiblesData) {
         if (responsiblesData[key].id == responsibleId) {
@@ -117,8 +150,7 @@ sortingCheckbox.onchange = function() {
     }
 }
 
-function ajaxQuery() {
-    dataForQuery = {};
+function ajaxQuery(dataForQuery = {}) {
     if (dateCheckbox.checked) Object.assign(dataForQuery, {
         'filterData': dateSelector.value
     });
@@ -143,6 +175,12 @@ function ajaxQuery() {
             }
         }
     });
+}
+
+let modalSubmitButton = document.querySelector('.update-btn-primary');
+modalSubmitButton.onclick = function() {
+    let dataFromForm = $('.update-modal-body').serialize() + '&update=true';
+    ajaxQuery(dataFromForm);
 }
 
 ajaxQuery();
