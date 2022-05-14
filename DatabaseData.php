@@ -19,16 +19,28 @@
             $oConnection = new mysqli('localhost', 'root', '', 'todo_list_task');
             $sQuery = 'select caption, priority.value as priority, 
                 expiration_date, 
-                concat(users.surname, 
+                concat(r.surname, 
                     \' \',
-                users.name,
+                r.name,
                     \' \',
-                users.patronymic_name) as name,
-                status.value as status 
+                r.patronymic_name) as rName,
+                status.value as status,
+                description,
+                date_of_creation,
+                update_date,
+                creator,
+                responsible,
+                tasks.id,
+                concat(c.surname, 
+                    \' \',
+                c.name,
+                    \' \',
+                c.patronymic_name) as cName
                 from tasks 
                 join status on tasks.status = status.id
                 join priority on tasks.priority = priority.id
-                join users on tasks.responsible = users.id ';
+                join users as r on tasks.responsible = r.id
+                join users as c on tasks.creator = c.id';
             if (!empty($_POST['filterData'])) {
                 switch ($_POST['filterData']) {
                     case 'today': {
