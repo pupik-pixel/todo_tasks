@@ -16,11 +16,11 @@ function fillTableWithTasks(data) {
         else {
             newRow.classList.add("table-light");
         }
-        (Object.values(element)).forEach(element => {
+        for (var key in element) {
             let newCell = newRow.insertCell();
-            let newText = document.createTextNode(element);
-            newCell.appendChild(newText); 
-        });
+            let newText = document.createTextNode(element[key]);
+            newCell.appendChild(newText);     
+        }
     });
     $('.responsible-select-js').empty();
     data.responsibles.forEach(element => {
