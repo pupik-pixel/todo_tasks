@@ -35,9 +35,7 @@ let dateCheckbox = document.querySelector('.date-check-input-js');
 let dateSelector = document.querySelector('.date-select-js');
 dateCheckbox.onchange = function() {
     if (dateCheckbox.checked) {
-        ajaxQuery({
-            'filterData': dateSelector.value
-        });
+        ajaxQuery();
         dateSelector.removeAttribute("disabled");
     }
     else {
@@ -45,18 +43,14 @@ dateCheckbox.onchange = function() {
     }
 }
 dateSelector.onchange = function() {
-    ajaxQuery({
-        'filterData': dateSelector.value
-    });
+    ajaxQuery();
 }
 
 let responsibleCheckbox = document.querySelector('.responsible-check-input-js');
 let responsibleSelector = document.querySelector('.responsible-select-js');
 responsibleCheckbox.onchange = function() {
     if (responsibleCheckbox.checked) {
-        ajaxQuery({
-            'filterResponsible': responsibleSelector.value
-        });
+        ajaxQuery();
         responsibleSelector.removeAttribute("disabled");
     }
     else {
@@ -64,12 +58,27 @@ responsibleCheckbox.onchange = function() {
     }
 }
 responsibleSelector.onchange = function() {
-    ajaxQuery({
-        'filterResponsible': responsibleSelector.value
-    });
+    ajaxQuery();
 }
 
-function ajaxQuery(dataForQuery = null) {
+let sortingCheckbox = document.querySelector('.sort-check-input-js');
+sortingCheckbox.onchange = function() {
+    if (sortingCheckbox.checked) {
+        ajaxQuery();
+    }
+}
+
+function ajaxQuery() {
+    dataForQuery = {};
+    if (dateCheckbox.checked) Object.assign(dataForQuery, {
+        'filterData': dateSelector.value
+    });
+    if (responsibleCheckbox.checked) Object.assign(dataForQuery, {
+        'filterResponsible': responsibleSelector.value
+    });
+    if (sortingCheckbox.checked) Object.assign(dataForQuery, {
+        'sortByUpdateDate': true
+    });
     $.ajax({
         type: "POST",
         url: 'tasksAction.php',

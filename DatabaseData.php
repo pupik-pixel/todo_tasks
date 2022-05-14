@@ -44,6 +44,12 @@
                     }
                 }
             }
+            if (!empty($_POST['sortByUpdateDate'])) {
+                $sQuery = $sQuery.' order by update_date asc';
+            }
+            else {
+                $sQuery = $sQuery.' order by expiration_date asc';
+            }
             $oQueryWithLogin = $oConnection->query($sQuery);
             while ($aResultRow = $oQueryWithLogin->fetch_assoc())
             {
