@@ -1,4 +1,9 @@
 .task-table-wrap {
     width: 80%;
     margin: auto;
+    display: flex;
+}
+
+.task-table-wrap__table, .task-table-wrap__parameter {
+    flex-grow: 1;
 }
