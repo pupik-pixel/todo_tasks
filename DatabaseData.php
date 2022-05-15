@@ -9,25 +9,40 @@ class DatabaseData
         $this->oConnection = new mysqli('localhost', 'root', '', 'todo_list_task');
     }
 
-    public function closeConnection() {
+    function __destruct() {
         $this->oConnection->close();
     }
 
     public function isAuthenticationStatus()
     {
-        $oQueryWithLogin = $this->oConnection->query(
+        $aResult = [];
+        $oQuery = $this->oConnection->query(
             'select session_id,
                     id,
                     concat (surname, \' \', name, \' \', patronymic_name) as name,
                     supervisor
                     from users 
                     where session_id = \'' . $_COOKIE['session'] . '\'');
-        if ($aResult = $oQueryWithLogin->fetch_assoc()) {
-            return [
+        if ($aResultFromUserTable = $oQuery->fetch_assoc()) {
+            $aResult = [
                 'status' => true,
-                'userId' => $aResult['id'],
-                'userName' => $aResult['name']
+                'userId' => $aResultFromUserTable['id'],
+                'userName' => $aResultFromUserTable['name'],
+                'supervisor' => $aResultFromUserTable['supervisor']
             ];
+            $oQuery = $this->oConnection->query(
+                'select id,
+                concat(users.surname, 
+                    \' \',
+                users.name,
+                    \' \',
+                users.patronymic_name) as name
+                    from users 
+                    where supervisor = \'' . $aResult['userId'] . '\'');
+            while ($aResultFromUserTable = $oQuery->fetch_assoc()) {
+                $aResult['subordinates'][] = $aResultFromUserTable;
+            }
+            return $aResult;
         } else {
             return [
                 'status' => false
@@ -86,8 +101,8 @@ class DatabaseData
         } else {
             $sQuery = $sQuery . ' order by expiration_date asc';
         }
-        $oQueryWithLogin = $this->oConnection->query($sQuery);
-        while ($aResultRow = $oQueryWithLogin->fetch_assoc()) {
+        $oQuery = $this->oConnection->query($sQuery);
+        while ($aResultRow = $oQuery->fetch_assoc()) {
             $aResult[] = $aResultRow;
         }
         return $aResult;
@@ -110,8 +125,8 @@ class DatabaseData
             $sQuery = $sQuery . 'and users.id=' . $_POST['filterResponsible'];
         }
         $sQuery = $sQuery . ' group by tasks.responsible';
-        $oQueryWithLogin = $this->oConnection->query($sQuery);
-        while ($aResultRow = $oQueryWithLogin->fetch_assoc()) {
+        $oQuery = $this->oConnection->query($sQuery);
+        while ($aResultRow = $oQuery->fetch_assoc()) {
             $aResult[] = $aResultRow;
         }
         return $aResult;
@@ -121,8 +136,8 @@ class DatabaseData
     {
         $aResult = [];
         $sQuery = 'select * from priority';
-        $oQueryWithLogin = $this->oConnection->query($sQuery);
-        while ($aResultRow = $oQueryWithLogin->fetch_assoc()) {
+        $oQuery = $this->oConnection->query($sQuery);
+        while ($aResultRow = $oQuery->fetch_assoc()) {
             $aResult[] = $aResultRow;
         }
         return $aResult;
@@ -132,8 +147,8 @@ class DatabaseData
     {
         $aResult = [];
         $sQuery = 'select * from status';
-        $oQueryWithLogin = $this->oConnection->query($sQuery);
-        while ($aResultRow = $oQueryWithLogin->fetch_assoc()) {
+        $oQuery = $this->oConnection->query($sQuery);
+        while ($aResultRow = $oQuery->fetch_assoc()) {
             $aResult[] = $aResultRow;
         }
         return $aResult;

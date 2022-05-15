@@ -28,5 +28,5 @@ else {
         'isAuthentication' =>  $aAuthData
     ]);
 }
-$databaseData->closeConnection();
+exit();
 ?>

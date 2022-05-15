@@ -42,7 +42,7 @@ let priorityModalSelector = document.querySelector('.priority-select-modal-js');
 let statusModalSelector = document.querySelector('.status-select-modal-js');
 function onClickRowHandler(event) {
     operationType = 'update';
-    let taskData = jsonData.tasksData;
+    let tasksData = jsonData.tasksData;
     let supervisorIdForCurrentUser = jsonData.isAuthentication.supervisor;
     let taskIndex = event.currentTarget.rowIndex - 1;
     let elementArray = ['id', 'caption', 'description', 'date_of_creation', 'expiration_date', 'update_date', 'cName'];
@@ -52,38 +52,42 @@ function onClickRowHandler(event) {
             modalInput.classList.remove('form-control');
             modalInput.classList.add('input-group-text');
         }
-        /*else if (supervisorIdForCurrentUser == taskData[taskIndex].creator) {
+        else if (supervisorIdForCurrentUser == tasksData[taskIndex].creator) {
+            modalInput.classList.remove('form-control');
+            modalInput.classList.add('input-group-text');
+        }
+        else {
             modalInput.classList.add('form-control');
             modalInput.classList.remove('input-group-text');
-        }*/
-        modalInput.value = taskData[taskIndex][key];
+        }
+        modalInput.value = tasksData[taskIndex][key];
     }
 
-    fillSelectorsInModal('priority', priorityModalSelector, taskData, taskIndex);
-    fillSelectorsInModal('status', statusModalSelector, taskData, taskIndex);
-    fillSelectorsInModal('responsible', responsibleModalSelector, taskData, taskIndex);
+    fillSelectorsInModal('priority', priorityModalSelector, tasksData, taskIndex, supervisorIdForCurrentUser);
+    fillSelectorsInModal('status', statusModalSelector, tasksData, taskIndex);
+    fillSelectorsInModal('responsible', responsibleModalSelector, tasksData, taskIndex, supervisorIdForCurrentUser);
 }
 
-function fillSelectorsInModal(keyString, keyModalSelector, taskData, taskIndex) {
-    let keyData
-    if (keyString == 'responsible') keyData = jsonData.responsibles;
+function fillSelectorsInModal(keyString, keyModalSelector, tasksData, taskIndex, supervisorIdForCurrentUser = '') {
+    let keyData;
+    if (keyString == 'responsible') keyData = jsonData.isAuthentication.subordinates;
     else keyData = jsonData[keyString];
     $('.' + keyString + '-select-modal-js').empty();
     newOption = document.createElement("option");
     if (keyString == 'priority' || keyString == 'status') {
-        newOption.value = taskData[taskIndex][keyString + 'Id'];
-        newOption.text = taskData[taskIndex][keyString];
+        newOption.value = tasksData[taskIndex][keyString + 'Id'];
+        newOption.text = tasksData[taskIndex][keyString];
     }
     else {
-        newOption.value = taskData[taskIndex].responsible;
-        newOption.text = taskData[taskIndex].rName;
+        newOption.value = tasksData[taskIndex].responsible;
+        newOption.text = tasksData[taskIndex].rName;
     }
     newOption.setAttribute('selected', 'selected');
     keyModalSelector.add(newOption, null);
     let keyId;
-    if (keyString == 'priority' || keyString == 'status') keyId = taskData[taskIndex][keyString + 'Id'];
+    if (keyString == 'priority' || keyString == 'status') keyId = tasksData[taskIndex][keyString + 'Id'];
     else
-    keyId = taskData[taskIndex].responsible;
+    keyId = tasksData[taskIndex].responsible;
     for (var key in keyData) {
         if (keyData[key].id == keyId) {
             continue;
@@ -101,8 +105,8 @@ function fillSelectorsInModal(keyString, keyModalSelector, taskData, taskIndex) 
 }
 
 function fillSelectorsInModalWithoutData(keyString, keyModalSelector) {
-    let keyData
-    if (keyString == 'responsible') keyData = jsonData.responsibles;
+    let keyData;
+    if (keyString == 'responsible') keyData = jsonData.isAuthentication.subordinates;
     else keyData = jsonData[keyString];
     $('.' + keyString + '-select-modal-js').empty();
     for (var key in keyData) {
@@ -192,11 +196,11 @@ addTaskButton.onclick = function() {
         let modalInput = document.querySelector('input[name=\''+ key + '\']');
         if (key == 'cName') {
             modalInput.value = jsonData.isAuthentication.userName;
+            modalInput.classList.remove('form-control');
+            modalInput.classList.add('input-group-text');
         }
         else {
             modalInput.value = '';
-        }
-        if (key == 'id' || key == 'date_of_creation' || key == 'update_date' || key == 'cName') {
             modalInput.classList.add('form-control');
             modalInput.classList.remove('input-group-text');
         }
