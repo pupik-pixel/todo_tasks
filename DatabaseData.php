@@ -79,22 +79,15 @@ class DatabaseData
                 join priority on tasks.priority = priority.id
                 join users as r on tasks.responsible = r.id
                 join users as c on tasks.creator = c.id';
-        if (!empty($_POST['filterData'])) {
-            switch ($_POST['filterData']) {
-                case 'today':
-                {
-                    $oCurrentDate = new DateTime(date('Y-m-d'));
-                    $sQuery = $sQuery . 'where expiration_date=\'' . $oCurrentDate->format('Y-m-d') . '\'';
-                    break;
-                }
-                case 'duringThisWeek':
-                {
-                    $oNextWeekDate = new DateTime(date('Y-m-d'));
-                    $oNextWeekDate->add(new DateInterval('P1W'));
-                    $sQuery = $sQuery . 'where expiration_date<\'' . $oNextWeekDate->format('Y-m-d') . '\'';
-                    break;
-                }
-            }
+        if (!empty($_POST['filterData']) && !empty($_POST['filterResponsible'])) {
+            $sQuery = $this->addFilterByDate($sQuery);
+            $sQuery = $sQuery.' and responsible = \''.$_POST['filterResponsible'].'\'';
+        }
+        elseif (!empty($_POST['filterData'])) {
+            $sQuery = $this->addFilterByDate($sQuery);
+        }
+        elseif (!empty($_POST['filterResponsible'])) {
+            $sQuery = $sQuery.' where responsible = \''.$_POST['filterResponsible'].'\'';
         }
         if (!empty($_POST['sortByUpdateDate'])) {
             $sQuery = $sQuery . ' order by update_date asc';
@@ -108,6 +101,24 @@ class DatabaseData
         return $aResult;
     }
 
+    private function addFilterByDate($sQuery) {
+        switch ($_POST['filterData']) {
+            case 'today':
+            {
+                $oCurrentDate = new DateTime(date('Y-m-d'));
+                $sQuery = $sQuery . ' where expiration_date=\'' . $oCurrentDate->format('Y-m-d') . '\'';
+                break;
+            }
+            case 'duringThisWeek':
+            {
+                $oNextWeekDate = new DateTime(date('Y-m-d'));
+                $oNextWeekDate->add(new DateInterval('P1W'));
+                $sQuery = $sQuery . ' where expiration_date<\'' . $oNextWeekDate->format('Y-m-d') . '\'';
+                break;
+            }
+        }
+        return $sQuery;
+    }
     public function getAllResponsibles()
     {
         $aResult = [];
@@ -120,11 +131,8 @@ class DatabaseData
                 from tasks
                 join users on tasks.responsible = users.id
                 where tasks.responsible is not null 
-                ';
-        if (!empty($_POST['filterResponsible'])) {
-            $sQuery = $sQuery . 'and users.id=' . $_POST['filterResponsible'];
-        }
-        $sQuery = $sQuery . ' group by tasks.responsible';
+                group by tasks.responsible';
+        $sQuery = $sQuery . ' ';
         $oQuery = $this->oConnection->query($sQuery);
         while ($aResultRow = $oQuery->fetch_assoc()) {
             $aResult[] = $aResultRow;
