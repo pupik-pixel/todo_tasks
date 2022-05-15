@@ -1,4 +1,5 @@
 var jsonData;
+var operationType;
 function fillTableWithTasks(data) {
     $(".table > tbody").remove(); 
     let table = document.querySelector('.table');
@@ -36,75 +37,84 @@ function fillTableWithTasks(data) {
     });
 }
 
-let modalBody = document.querySelector('.modal-body');
 let responsibleModalSelector = document.querySelector('.responsible-select-modal-js');
 let priorityModalSelector = document.querySelector('.priority-select-modal-js');
 let statusModalSelector = document.querySelector('.status-select-modal-js');
 function onClickRowHandler(event) {
+    operationType = 'update';
     let taskData = jsonData.tasksData;
+    let supervisorIdForCurrentUser = jsonData.isAuthentication.supervisor;
     let taskIndex = event.currentTarget.rowIndex - 1;
     let elementArray = ['id', 'caption', 'description', 'date_of_creation', 'expiration_date', 'update_date', 'cName'];
     for (var key of elementArray) {
         let modalInput = document.querySelector('input[name=\''+ key + '\']');
         if (key == 'id' || key == 'date_of_creation' || key == 'update_date' || key == 'cName') {
-            modalInput.classList.toggle('form-control');
-            modalInput.classList.toggle('input-group-text');
+            modalInput.classList.remove('form-control');
+            modalInput.classList.add('input-group-text');
         }
+        /*else if (supervisorIdForCurrentUser == taskData[taskIndex].creator) {
+            modalInput.classList.add('form-control');
+            modalInput.classList.remove('input-group-text');
+        }*/
         modalInput.value = taskData[taskIndex][key];
     }
 
-    let priorityData = jsonData.priority;
-    $('.priority-select-modal-js').empty();
-    newOption = document.createElement("option");
-    newOption.value = taskData[taskIndex].priorityId;
-    newOption.text = taskData[taskIndex].priority;
-    newOption.setAttribute('selected', 'selected');
-    priorityModalSelector.add(newOption, null);
-    let priorityId = taskData[taskIndex].priorityId;
-    for (var key in priorityData) {
-        if (priorityData[key].id == priorityId) {
-            continue;
-        }
-        newOption = document.createElement("option");
-        newOption.value = priorityData[key].id;
-        newOption.text = priorityData[key].value;
-        priorityModalSelector.add(newOption, null);
-    }
+    fillSelectorsInModal('priority', priorityModalSelector, taskData, taskIndex);
+    fillSelectorsInModal('status', statusModalSelector, taskData, taskIndex);
+    fillSelectorsInModal('responsible', responsibleModalSelector, taskData, taskIndex);
+}
 
-    let statusData = jsonData.status;
-    $('.status-select-modal-js').empty();
+function fillSelectorsInModal(keyString, keyModalSelector, taskData, taskIndex) {
+    let keyData
+    if (keyString == 'responsible') keyData = jsonData.responsibles;
+    else keyData = jsonData[keyString];
+    $('.' + keyString + '-select-modal-js').empty();
     newOption = document.createElement("option");
-    newOption.value = taskData[taskIndex].statusId;
-    newOption.text = taskData[taskIndex].status;
-    newOption.setAttribute('selected', 'selected');
-    statusModalSelector.add(newOption, null);
-    let statusId = taskData[taskIndex].statusId;
-    for (var key in statusData) {
-        if (statusData[key].id == priorityId) {
-            continue;
-        }
-        newOption = document.createElement("option");
-        newOption.value = statusData[key].id;
-        newOption.text = statusData[key].value;
-        statusModalSelector.add(newOption, null);
+    if (keyString == 'priority' || keyString == 'status') {
+        newOption.value = taskData[taskIndex][keyString + 'Id'];
+        newOption.text = taskData[taskIndex][keyString];
     }
-
-    let responsiblesData = jsonData.responsibles;
-    $('.responsible-select-modal-js').empty();
-    newOption = document.createElement("option");
-    newOption.value = taskData[taskIndex].responsible;
-    newOption.text = taskData[taskIndex].rName;
+    else {
+        newOption.value = taskData[taskIndex].responsible;
+        newOption.text = taskData[taskIndex].rName;
+    }
     newOption.setAttribute('selected', 'selected');
-    responsibleModalSelector.add(newOption, null);
-    let responsibleId = taskData[taskIndex].responsible;
-    for (var key in responsiblesData) {
-        if (responsiblesData[key].id == responsibleId) {
+    keyModalSelector.add(newOption, null);
+    let keyId;
+    if (keyString == 'priority' || keyString == 'status') keyId = taskData[taskIndex][keyString + 'Id'];
+    else
+    keyId = taskData[taskIndex].responsible;
+    for (var key in keyData) {
+        if (keyData[key].id == keyId) {
             continue;
         }
         newOption = document.createElement("option");
-        newOption.value = responsiblesData[key].id;
-        newOption.text = responsiblesData[key].name;
-        responsibleModalSelector.add(newOption, null);
+        newOption.value = keyData[key].id;
+        if (keyString == 'priority' || keyString == 'status') {
+            newOption.text = keyData[key].value;
+        }
+        else {
+            newOption.text = keyData[key].name;
+        }
+        keyModalSelector.add(newOption, null);
+    }
+}
+
+function fillSelectorsInModalWithoutData(keyString, keyModalSelector) {
+    let keyData
+    if (keyString == 'responsible') keyData = jsonData.responsibles;
+    else keyData = jsonData[keyString];
+    $('.' + keyString + '-select-modal-js').empty();
+    for (var key in keyData) {
+        newOption = document.createElement("option");
+        newOption.value = keyData[key].id;
+        if (keyString == 'priority' || keyString == 'status') {
+            newOption.text = keyData[key].value;
+        }
+        else {
+            newOption.text = keyData[key].name;
+        }
+        keyModalSelector.add(newOption, null);
     }
 }
 
@@ -161,20 +171,54 @@ function ajaxQuery(dataForQuery = {}) {
         data: dataForQuery,
         success: function (response) {
             jsonData = JSON.parse(response);
-            if (jsonData.isAuthentication) {
+            if (jsonData.isAuthentication.status) {
                 fillTableWithTasks(jsonData);
                 console.log(jsonData);
             }
             else {
-                window.location.replace('auth.php');
+                window.location.replace('auth.html');
             }
         }
     });
 }
 
+let addTaskButton = document.querySelector('.btn-add-task');
+addTaskButton.setAttribute("data-bs-toggle", "modal");
+addTaskButton.setAttribute("data-bs-target", "#editorModal");
+addTaskButton.onclick = function() {
+    operationType = 'insert';
+    let elementArray = ['id', 'caption', 'description', 'date_of_creation', 'expiration_date', 'update_date', 'cName'];
+    for (var key of elementArray) {
+        let modalInput = document.querySelector('input[name=\''+ key + '\']');
+        if (key == 'cName') {
+            modalInput.value = jsonData.isAuthentication.userName;
+        }
+        else {
+            modalInput.value = '';
+        }
+        if (key == 'id' || key == 'date_of_creation' || key == 'update_date' || key == 'cName') {
+            modalInput.classList.add('form-control');
+            modalInput.classList.remove('input-group-text');
+        }
+    }
+    fillSelectorsInModalWithoutData('priority', priorityModalSelector);
+    fillSelectorsInModalWithoutData('status', statusModalSelector);
+    fillSelectorsInModalWithoutData('responsible', responsibleModalSelector);
+}
+
+let buttonExit = document.querySelector('.btn-exit');
+buttonExit.onclick = function() {
+    ajaxQuery({
+        'exitTheApplication': true
+    });
+}
+
 let modalSubmitButton = document.querySelector('.save-btn-primary');
 modalSubmitButton.onclick = function() {
-    let dataFromForm = $('.modal-body').serialize() + '&update=true';
+    let addingString;
+    if (operationType == 'update') addingString = '&update=true';
+    if (operationType == 'insert') addingString = '&insert=true&creator=' + jsonData.isAuthentication.userId;
+    let dataFromForm = $('.modal-body').serialize() + addingString;
     ajaxQuery(dataFromForm);
 }
 

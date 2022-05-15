@@ -1,24 +1,32 @@
 <?php
 require_once('DatabaseData.php');
 
-$aTasksData = DatabaseData::getTasksData();
-$aResponsibleForTasks = DatabaseData::getAllResponsibles();
-if (DatabaseData::isAuthenticationStatus()) {
-    if ($_POST['update']) {
-        DatabaseData::updateDataForTask();
-    }
+$databaseData = new DatabaseData();
 
+if ($_POST['exitTheApplication']) {
+    $aAuthData = $databaseData->exitUser();
+}
+
+$aAuthData = $databaseData->isAuthenticationStatus();
+if ($aAuthData['status']) {
+    if ($_POST['update']) {
+        $databaseData->updateDataForTask();
+    }
+    if ($_POST['insert']) {
+         $databaseData->insertDataForTask();
+    }
     echo json_encode([
-        'isAuthentication' =>  DatabaseData::isAuthenticationStatus(),
-        'tasksData' => DatabaseData::getTasksData(),
-        'responsibles' => DatabaseData::getAllResponsibles(),
-        'priority' => DatabaseData::getAllPriority(),
-        'status' => DatabaseData::getAllStatus()
+        'isAuthentication' => $aAuthData,
+        'tasksData' => $databaseData->getTasksData(),
+        'responsibles' => $databaseData->getAllResponsibles(),
+        'priority' => $databaseData->getAllPriority(),
+        'status' => $databaseData->getAllStatus()
     ]);
 }
 else {
     echo json_encode([
-        'isAuthentication' =>  DatabaseData::isAuthenticationStatus()
+        'isAuthentication' =>  $aAuthData
     ]);
 }
+$databaseData->closeConnection();
 ?>
