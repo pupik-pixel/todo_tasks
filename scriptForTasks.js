@@ -1,5 +1,6 @@
 var jsonData;
 var operationType;
+var currentFilterByResponsible = false;
 function fillTableWithTasks(data) {
     $(".table > tbody").remove(); 
     let table = document.querySelector('.table');
@@ -29,12 +30,20 @@ function fillTableWithTasks(data) {
         }
     });
     $('.responsible-select-js').empty();
-    data.responsibles.forEach(element => {
+    if (currentFilterByResponsible != false) {
         let newOption = document.createElement("option");
-        newOption.value = element.id;
-        newOption.text = element.name;
+        newOption.value = currentFilterByResponsible[0];
+        newOption.text = currentFilterByResponsible[1];
+        newOption.setAttribute('selected', 'selected');
         responsibleSelector.add(newOption, null);
-    });
+    }
+    for (var key in data.responsibles) {
+        if (data.responsibles[key].id == currentFilterByResponsible[0]) continue;
+        let newOption = document.createElement("option");
+        newOption.value = data.responsibles[key].id;
+        newOption.text = data.responsibles[key].name;
+        responsibleSelector.add(newOption, null);
+    }
 }
 
 let responsibleModalSelector = document.querySelector('.responsible-select-modal-js');
@@ -130,6 +139,7 @@ dateCheckbox.onchange = function() {
         dateSelector.removeAttribute("disabled");
     }
     else {
+        ajaxQuery();
         dateSelector.setAttribute("disabled", "disabled");
     }
 }
@@ -141,22 +151,24 @@ let responsibleCheckbox = document.querySelector('.responsible-check-input-js');
 let responsibleSelector = document.querySelector('.responsible-select-js');
 responsibleCheckbox.onchange = function() {
     if (responsibleCheckbox.checked) {
+        currentFilterByResponsible = [responsibleSelector.value, responsibleSelector.options[responsibleSelector.selectedIndex].text];
         ajaxQuery();
         responsibleSelector.removeAttribute("disabled");
     }
     else {
+        currentFilterByResponsible = false;
+        ajaxQuery();
         responsibleSelector.setAttribute("disabled", "disabled");
     }
 }
 responsibleSelector.onchange = function() {
+    currentFilterByResponsible = [responsibleSelector.value, responsibleSelector.options[responsibleSelector.selectedIndex].text];
     ajaxQuery();
 }
 
 let sortingCheckbox = document.querySelector('.sort-check-input-js');
 sortingCheckbox.onchange = function() {
-    if (sortingCheckbox.checked) {
-        ajaxQuery();
-    }
+    ajaxQuery();
 }
 
 function ajaxQuery(dataForQuery = {}) {
